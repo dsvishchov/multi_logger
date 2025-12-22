@@ -12,7 +12,27 @@ class SentryLogger extends Logger {
 
   @override
   Future<dynamic> logEvent(LogEvent event) async {
-    // final sentryLevel = SentryLevel.fromName(event.level.name);
+    final sentryLevel = SentryLevel.fromName(event.level.name);
+
+    ScopeCallback scope = (scope) {
+      event.extra?.forEach((key, value) {
+        scope.setContexts(key.toString(), value);
+      });
+    };
+
+    if (event.error != null) {
+      await Sentry.captureException(
+        event.error,
+        stackTrace: event.stackTrace,
+        withScope: scope,
+      );
+    } else {
+      await Sentry.captureMessage(
+        event.message,
+        level: sentryLevel,
+        withScope: scope,
+      );
+    }
 
     return event;
   }

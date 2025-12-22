@@ -1,16 +1,18 @@
 import 'package:sentry/sentry.dart';
 
 import '../log_event.dart';
-import 'stream_logger.dart';
+import '../logger.dart';
 
-class SentryLogger extends StreamLogger {
+class SentryLogger extends Logger {
   SentryLogger({
-    required super.level,
-    super.onLog,
+    super.level,
+    super.beforeLog,
+    super.afterLog,
   });
 
-  Future<LogEvent> logEvent(LogEvent event) async {
-    final sentryLevel = SentryLevel.fromName(event.level.name);
+  @override
+  Future<dynamic> logEvent(LogEvent event) async {
+    // final sentryLevel = SentryLevel.fromName(event.level.name);
 
     return event;
   }

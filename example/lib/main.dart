@@ -6,7 +6,10 @@ Future<void> main() async {
       ConsoleLogger(
         level: LogLevel.trace,
         logTimestamp: false,
-        onLog: (event) {
+        beforeLog: (event) {
+          return event;
+        },
+        afterLog: (event, output) {
           // Here we can post-process log event after log has been
           // actually printed to the console and we have an output
         }

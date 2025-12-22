@@ -1,9 +1,25 @@
 import 'dart:async';
 
+import 'log_event.dart';
 import 'log_level.dart';
 
 abstract class Logger {
-  const Logger();
+  const Logger({
+    this.level = LogLevel.all,
+    this.beforeLog,
+    this.afterLog,
+  });
+
+  /// Log level above which (including) events are dispatched
+  final LogLevel level;
+
+  /// Callback to be executed before every log,
+  /// allows to modify [LogEvent] before actually logging it
+  final BeforeLogCallback? beforeLog;
+
+  /// Callback to be executed after every log,
+  /// allows to get the actual output of the logging
+  final AfterLogCallback? afterLog;
 
   /// Log at level [LogLevel.trace]
   Future<void> trace(
@@ -113,7 +129,7 @@ abstract class Logger {
     );
   }
 
-  /// Log at specified level, should be implemented by subclasses
+  /// Log at specific level
   Future<void> log(
     LogLevel level,
     dynamic message, {
@@ -121,5 +137,49 @@ abstract class Logger {
     Object? error,
     StackTrace? stackTrace,
     Map<Object, dynamic>? extra,
-  });
+  }) {
+    LogEvent? event = LogEvent(
+      level: level,
+      message: message,
+      dateTime: dateTime,
+      error: error,
+      stackTrace: stackTrace,
+      extra: extra,
+    );
+
+    return processEvent(event);
+  }
+
+  /// Process specific event through level checks and callbacks
+  Future<void> processEvent(LogEvent event) async {
+    if (event.level < level) return;
+
+    LogEvent? modifiedEvent = event;
+
+    if (beforeLog != null) {
+      modifiedEvent = await beforeLog!(event);
+      if (modifiedEvent == null) {
+        return;
+      }
+    }
+
+    final output = await logEvent(modifiedEvent);
+
+    if (afterLog != null) {
+      await afterLog!(modifiedEvent, output);
+    }
+  }
+
+  /// Log specific event, should be implemented by subclasses
+  /// and return optional output/result of logging
+  Future<dynamic> logEvent(LogEvent event);
 }
+
+typedef BeforeLogCallback = FutureOr<LogEvent?> Function(
+  LogEvent event,
+);
+
+typedef AfterLogCallback = FutureOr<void> Function(
+  LogEvent event,
+  dynamic output,
+);

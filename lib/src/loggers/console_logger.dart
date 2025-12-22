@@ -5,12 +5,13 @@ import 'package:logger/logger.dart' as console;
 import 'package:stack_trace/stack_trace.dart';
 
 import '../log_event.dart';
-import 'stream_logger.dart';
+import '../logger.dart';
 
-class ConsoleLogger extends StreamLogger {
+class ConsoleLogger extends Logger {
   ConsoleLogger({
-    required super.level,
-    super.onLog,
+    super.level,
+    super.beforeLog,
+    super.afterLog,
     this.excludePaths = const [],
     this.logTimestamp = false,
   }) {
@@ -19,6 +20,10 @@ class ConsoleLogger extends StreamLogger {
       logTimestamp: logTimestamp,
     );
 
+    // We have to have two different console loggers and printers
+    // since we want to have boxing for all levels but only if
+    // there is an error, and logger package doesn't provide this
+    // functionality out of the box.
     _messageLogPrinter = _logPrinter(noBoxing: true);
     _messageLogger = _logger(logPrinter: _messageLogPrinter);
 
@@ -29,7 +34,8 @@ class ConsoleLogger extends StreamLogger {
   final List<String> excludePaths;
   final bool logTimestamp;
 
-  Future<LogEvent> logEvent(LogEvent event) async {
+  @override
+  Future<dynamic> logEvent(LogEvent event) async {
     final consoleLevel = console.Level.values.firstWhere(
       (value) => value.name == event.level.name,
       orElse: () => .debug,
@@ -61,7 +67,7 @@ class ConsoleLogger extends StreamLogger {
     // Unfortunately there is no other way to get output after
     // actual logging to console. We cannot use a listener here
     // cause we need the output immediatelly.
-    event.output = logPrinter.log(
+    return logPrinter.log(
       console.LogEvent(
         consoleLevel,
         event.message,
@@ -70,8 +76,6 @@ class ConsoleLogger extends StreamLogger {
         stackTrace: stackTrace,
       ),
     );
-
-    return event;
   }
 
   late console.LogFilter _logFilter;

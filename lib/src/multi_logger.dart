@@ -7,6 +7,8 @@ late MultiLogger log;
 /// Provides an unfied way to log into multiple sources
 final class MultiLogger extends Logger {
   MultiLogger({
+    super.beforeLog,
+    super.afterLog,
     this.loggers = const [],
   });
 
@@ -14,8 +16,8 @@ final class MultiLogger extends Logger {
   final List<Logger> loggers;
 
   Future<void> logEvent(LogEvent event) async {
-    loggers.forEach((logger) {
-      logger.processEvent(event);
+    loggers.forEach((logger) async {
+      await logger.processEvent(event);
     });
   }
 }

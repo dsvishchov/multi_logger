@@ -28,7 +28,7 @@ class SentryLogger extends Logger {
       );
     } else {
       await Sentry.captureMessage(
-        event.message,
+        event.message.toString(),
         level: sentryLevel,
         withScope: scope,
       );

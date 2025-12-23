@@ -48,6 +48,11 @@ class ConsoleLogger extends Logger {
       ? Trace.from(stackTrace)
       : stackTrace;
 
+    final message = StringBuffer(event.message ?? '');
+    if ((event.extra != null) && event.extra!.isNotEmpty) {
+      _logExtra(event.extra!, message);
+    }
+
     final logger = event.error != null
       ? _errorLogger
       : _messageLogger;
@@ -58,7 +63,7 @@ class ConsoleLogger extends Logger {
 
     logger.log(
       consoleLevel,
-      event.message,
+      message.toString().trim(),
       time: event.dateTime,
       error: event.error,
       stackTrace: stackTrace,
@@ -114,6 +119,31 @@ class ConsoleLogger extends Logger {
         ...excludePaths.map((path) => 'package:$path')
       ],
     );
+  }
+
+  void _logExtra(
+    Map<Object, dynamic> extra,
+    StringBuffer buffer,
+  ) {
+    final headerColor = const console.AnsiColor.fg(221);
+    final detailColor = console.AnsiColor.fg(
+      console.AnsiColor.grey(0.5),
+    );
+
+    buffer.writeln();
+    extra.forEach((key, value) {
+      buffer.writeln('$headerColor• $key:');
+
+      if (value is Map) {
+        value.forEach((key, value) {
+          buffer.writeln('  $detailColor$key: $value');
+        });
+      } else {
+        for (final (line) in '$value'.trim().split('\n')) {
+          buffer.writeln('  $detailColor$line');
+        }
+      }
+    });
   }
 }
 

@@ -14,10 +14,13 @@ class SentryLogger extends Logger {
   Future<dynamic> logEvent(LogEvent event) async {
     final sentryLevel = SentryLevel.fromName(event.level.name);
 
-    ScopeCallback scope = (scope) {
-      event.extra?.forEach((key, value) {
-        scope.setContexts(key.toString(), value);
-      });
+    ScopeCallback scope = (scope) async {
+      if ((event.extra != null) && event.extra!.isNotEmpty) {
+        await scope.setContexts(
+          'Extra',
+          event.extra!.map((k, v) => MapEntry(k.toString(), v.toString())),
+        );
+      }
     };
 
     if (event.error != null) {

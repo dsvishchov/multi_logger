@@ -11,7 +11,6 @@ class ConsoleLogger extends Logger {
   ConsoleLogger({
     super.level,
     super.beforeLog,
-    super.afterLog,
     this.excludePaths = const [],
     this.logTimestamp = false,
   }) {

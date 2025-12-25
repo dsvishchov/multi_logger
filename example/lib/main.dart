@@ -1,7 +1,7 @@
 import 'package:multi_logger/multi_logger.dart';
 
 Future<void> main() async {
-  log = MultiLogger(
+  logger = MultiLogger(
     loggers: [
       ConsoleLogger(
         level: LogLevel.trace,
@@ -9,10 +9,6 @@ Future<void> main() async {
         beforeLog: (event) {
           return event;
         },
-        afterLog: (event, output) {
-          // Here we can post-process log event after log has been
-          // actually printed to the console and we have an output
-        }
       ),
       SentryLogger(
         level: LogLevel.error,
@@ -22,5 +18,5 @@ Future<void> main() async {
 
   final exception = new Exception('Test exception');
 
-  log.trace(exception);
+  logger.trace(exception);
 }

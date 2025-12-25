@@ -7,7 +7,6 @@ class SentryLogger extends Logger {
   SentryLogger({
     super.level,
     super.beforeLog,
-    super.afterLog,
   });
 
   @override

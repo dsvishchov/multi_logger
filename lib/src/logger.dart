@@ -4,10 +4,9 @@ import 'log_event.dart';
 import 'log_level.dart';
 
 abstract class Logger {
-  const Logger({
+  Logger({
     this.level = LogLevel.all,
     this.beforeLog,
-    this.afterLog,
   });
 
   /// Log level above which (including) events are dispatched
@@ -17,9 +16,9 @@ abstract class Logger {
   /// allows to modify [LogEvent] before actually logging it
   final BeforeLogCallback? beforeLog;
 
-  /// Callback to be executed after every log,
-  /// allows to get the actual output of the logging
-  final AfterLogCallback? afterLog;
+  /// Stream of log events and their outputs
+  Stream<LogEventWithOutput> get events => _eventsController.stream;
+  final _eventsController = StreamController<LogEventWithOutput>.broadcast();
 
   /// Log at level [LogLevel.trace]
   Future<void> trace(
@@ -165,9 +164,10 @@ abstract class Logger {
 
     final output = await logEvent(modifiedEvent);
 
-    if (afterLog != null) {
-      await afterLog!(modifiedEvent, output);
-    }
+    _eventsController.add((
+      event: modifiedEvent,
+      output: output,
+    ));
   }
 
   /// Log specific event, should be implemented by subclasses
@@ -175,11 +175,11 @@ abstract class Logger {
   Future<dynamic> logEvent(LogEvent event);
 }
 
-typedef BeforeLogCallback = FutureOr<LogEvent?> Function(
-  LogEvent event,
-);
-
-typedef AfterLogCallback = FutureOr<void> Function(
+typedef LogEventWithOutput = ({
   LogEvent event,
   dynamic output,
+});
+
+typedef BeforeLogCallback = FutureOr<LogEvent?> Function(
+  LogEvent event,
 );

@@ -17,8 +17,8 @@ abstract class Logger {
   final BeforeLogCallback? beforeLog;
 
   /// Stream of log events and their outputs
-  Stream<LogEventWithOutput> get events => _eventsController.stream;
-  final _eventsController = StreamController<LogEventWithOutput>.broadcast();
+  Stream<(LogEvent, dynamic)> get events => _eventsController.stream;
+  final _eventsController = StreamController<(LogEvent, dynamic)>.broadcast();
 
   /// Log at level [LogLevel.trace]
   Future<void> trace(
@@ -164,21 +164,13 @@ abstract class Logger {
 
     final output = await logEvent(modifiedEvent);
 
-    _eventsController.add((
-      event: modifiedEvent,
-      output: output,
-    ));
+    _eventsController.add((modifiedEvent, output));
   }
 
   /// Log specific event, should be implemented by subclasses
   /// and return optional output/result of logging
   Future<dynamic> logEvent(LogEvent event);
 }
-
-typedef LogEventWithOutput = ({
-  LogEvent event,
-  dynamic output,
-});
 
 typedef BeforeLogCallback = FutureOr<LogEvent?> Function(
   LogEvent event,

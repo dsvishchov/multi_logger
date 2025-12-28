@@ -140,7 +140,7 @@ abstract class Logger {
     LogEvent? event = LogEvent(
       level: level,
       message: message,
-      dateTime: dateTime,
+      dateTime: dateTime ?? DateTime.now(),
       error: error,
       stackTrace: stackTrace,
       extra: extra,

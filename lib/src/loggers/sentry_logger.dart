@@ -20,6 +20,12 @@ class SentryLogger extends Logger {
           event.extra!.map((k, v) => MapEntry(k.toString(), v.toString())),
         );
       }
+
+      // TODO: implement fingerprinting for log events
+      //
+      // scope.fingerprint = [
+      //   event.message.toString(),
+      // ];
     };
 
     if (event.error != null) {

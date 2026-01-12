@@ -16,7 +16,7 @@ Future<void> main() async {
     ]
   );
 
-  final exception = new Exception('Test exception');
+  final exception = Exception('Test exception');
 
   logger.trace(exception);
 }

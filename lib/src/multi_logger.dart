@@ -14,9 +14,10 @@ final class MultiLogger extends Logger {
   /// List of loggers events to be logged into
   final List<Logger> loggers;
 
+  @override
   Future<void> logEvent(LogEvent event) async {
-    loggers.forEach((logger) async {
+    for (final logger in loggers) {
       await logger.processEvent(event);
-    });
+    }
   }
 }

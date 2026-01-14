@@ -28,7 +28,7 @@ logger = MultiLogger(
 );
 ```
 
-It is also possible to use any logger seprately. `MultiLogger` is just an another type of logger
+It is also possible to use any logger separately. `MultiLogger` is just an another type of logger
 implementing logging to multiple sources and sharing absolutely the same interface.
 
 ## Use
@@ -37,7 +37,7 @@ There are 5 levels and corresponding methods to use:  `trace`, `debug`, `info`,
 `warning`, `error` and `fatal`. All of them use the same set of parameters:
 - `message`: this might be anything, usually logger will use `toString()` to get a string representation
 - `dateTime`: optional date/time associated with the log event, current date/time will be used if not provided
-- `error`: optional error associated witht the log event, usually logger will use `toString()` to get a string representation
+- `error`: optional error associated with the log event, usually logger will use `toString()` to get a string representation
 - `stackTrace`: optional log event stack trace, current stack trace will be used if not provided
 - `extra`: an arbitrary extra data associated with the log event
 

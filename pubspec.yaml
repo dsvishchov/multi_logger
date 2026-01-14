@@ -1,6 +1,6 @@
 name: multi_logger
 description: Dispatch logs to multiple sources like console or Sentry
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/dsvishchov/multi_logger
 issue_tracker: https://github.com/dsvishchov/multi_logger/issues
 

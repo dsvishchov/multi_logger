@@ -4,6 +4,8 @@ import 'dart:io' show Platform;
 import 'package:logger/logger.dart' as console;
 import 'package:stack_trace/stack_trace.dart';
 
+import '/src/utils/name_transform_utils.dart';
+
 import '../log_event.dart';
 import '../logger.dart';
 
@@ -13,6 +15,7 @@ class ConsoleLogger extends Logger {
     super.beforeLog,
     this.excludePaths = const [],
     this.logTimestamp = false,
+    this.capitalizeExtraKeys = true,
   }) {
     _logFilter = _ConsoleLogFilter();
     _logOutput = _ConsoleLogOutput(
@@ -32,6 +35,7 @@ class ConsoleLogger extends Logger {
 
   final List<String> excludePaths;
   final bool logTimestamp;
+  final bool capitalizeExtraKeys;
 
   @override
   Future<dynamic> logEvent(LogEvent event) async {
@@ -131,6 +135,9 @@ class ConsoleLogger extends Logger {
 
     buffer.writeln();
     extra.forEach((key, value) {
+      if (capitalizeExtraKeys) {
+        key = camelToCapitalized(key.toString());
+      }
       buffer.writeln('$headerColor• $key:');
 
       if (value is Map) {

@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Add option to capitalize extra keys in console and Sentry loggers
+
 ## 0.0.4
 
 - Add message to extra in Sentry errors

@@ -5,26 +5,29 @@ import 'package:sentry/sentry.dart';
 import '../log_event.dart';
 import '../log_level.dart';
 import '../logger.dart';
+import '../utils/name_transform_utils.dart';
 
 class SentryLogger extends Logger {
   SentryLogger({
     super.level,
     super.beforeLog,
     this.useBreadcrumbs = true,
+    this.capitalizeExtraKeys = true,
   });
 
   final bool useBreadcrumbs;
+  final bool capitalizeExtraKeys;
 
   @override
   Future<dynamic> logEvent(LogEvent event) async {
-    final Map<String, dynamic> extra = ((event.extra != null) && event.extra!.isNotEmpty)
-      ? event.extra!.map((k, v) => MapEntry(k.toString(), v.toString()))
-      : {};
-    if (event.message != null) {
-      extra.addAll({
-        'Message': event.message,
-      });
-    }
+    final Map<String, dynamic> extra = {
+      'Message': ?event.message,
+      if ((event.extra != null) && event.extra!.isNotEmpty)
+        ...event.extra!.map((k, v) => MapEntry(
+          capitalizeExtraKeys ? camelToCapitalized(k.toString()) : k.toString(),
+          v.toString()
+        )),
+    };
 
     FutureOr<void> scope(Scope scope) async {
       if (extra.isNotEmpty) {

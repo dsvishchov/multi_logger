@@ -17,12 +17,17 @@ class SentryLogger extends Logger {
 
   @override
   Future<dynamic> logEvent(LogEvent event) async {
-    final extra = ((event.extra != null) && event.extra!.isNotEmpty)
+    final Map<String, dynamic> extra = ((event.extra != null) && event.extra!.isNotEmpty)
       ? event.extra!.map((k, v) => MapEntry(k.toString(), v.toString()))
-      : null;
+      : {};
+    if (event.message != null) {
+      extra.addAll({
+        'Message': event.message,
+      });
+    }
 
     FutureOr<void> scope(Scope scope) async {
-      if (extra != null) {
+      if (extra.isNotEmpty) {
         await scope.setContexts('Extra', extra);
       }
 

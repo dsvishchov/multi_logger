@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Add message to extra in Sentry errors
+
 ## 0.0.3
 
 - Improve breadcrumbs formatting for Sentry logger

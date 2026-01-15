@@ -40,20 +40,22 @@ class SentryLogger extends Logger {
       );
     } else {
       final sentryLevel = SentryLevel.fromName(event.level.name);
+      final message = ((event.error != null) ? '${event.error.toString()}\n' : '')
+        + ((event.message != null) ? event.message.toString() : '');
 
       if (useBreadcrumbs) {
         await Sentry.addBreadcrumb(
           Breadcrumb(
-            message: event.message.toString(),
+            message: message,
             timestamp: event.dateTime,
-            category: event.error?.runtimeType.toString(),
+            category: 'Log',
             data: extra,
             level: sentryLevel,
           ),
         );
       } else {
         await Sentry.captureMessage(
-          event.message.toString(),
+          message,
           level: sentryLevel,
           withScope: scope,
         );

@@ -20,13 +20,18 @@ class SentryLogger extends Logger {
 
   @override
   Future<dynamic> logEvent(LogEvent event) async {
+    final isException = (event.level >= LogLevel.error) && (event.error != null);
+
     final Map<String, dynamic> extra = {
-      'Message': ?event.message,
-      if ((event.extra != null) && event.extra!.isNotEmpty)
+      if (isException) ...{
+        'Message': ?event.message,
+      },
+      if ((event.extra != null) && event.extra!.isNotEmpty) ...{
         ...event.extra!.map((k, v) => MapEntry(
           capitalizeExtraKeys ? camelToCapitalized(k.toString()) : k.toString(),
           v.toString()
         )),
+      }
     };
 
     FutureOr<void> scope(Scope scope) async {
@@ -40,7 +45,7 @@ class SentryLogger extends Logger {
       // ];
     }
 
-    if ((event.level >= LogLevel.error) && (event.error != null)) {
+    if (isException) {
       await Sentry.captureException(
         event.error,
         stackTrace: event.stackTrace,

@@ -60,7 +60,7 @@ class SentryLogger extends Logger {
         await Sentry.addBreadcrumb(
           Breadcrumb(
             message: message,
-            timestamp: event.dateTime,
+            timestamp: event.dateTime?.toUtc(),
             category: 'Log',
             data: extra,
             level: sentryLevel,

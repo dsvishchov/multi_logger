@@ -1,3 +1,7 @@
+## 0.0.7
+
+- Fix issue with date time reporting to Sentry in a local timezone instead of UTC
+
 ## 0.0.6
 
 - Add message to extra on Sentry only for exceptions

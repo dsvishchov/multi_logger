@@ -1,3 +1,8 @@
+## 0.0.8
+
+- Add option to log error types in ConsoleLogger
+- Avoid duplicating message in ConsoleLogger if it's already in toString() of error
+
 ## 0.0.7
 
 - Fix issue with date time reporting to Sentry in a local timezone instead of UTC

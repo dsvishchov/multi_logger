@@ -4,10 +4,9 @@ import 'dart:io' show Platform;
 import 'package:logger/logger.dart' as console;
 import 'package:stack_trace/stack_trace.dart';
 
-import '/src/utils/name_transform_utils.dart';
-
 import '../log_event.dart';
 import '../logger.dart';
+import '../utils/name_casing.dart';
 
 class ConsoleLogger extends Logger {
   ConsoleLogger({
@@ -15,6 +14,7 @@ class ConsoleLogger extends Logger {
     super.beforeLog,
     this.excludePaths = const [],
     this.logTimestamp = false,
+    this.logErrorType = true,
     this.capitalizeExtraKeys = true,
   }) {
     _logFilter = _ConsoleLogFilter();
@@ -35,10 +35,14 @@ class ConsoleLogger extends Logger {
 
   final List<String> excludePaths;
   final bool logTimestamp;
+  final bool logErrorType;
   final bool capitalizeExtraKeys;
 
   @override
   Future<dynamic> logEvent(LogEvent event) async {
+    bool hasError = event.error != null;
+    bool hasMessage = event.message != null;
+
     final consoleLevel = console.Level.values.firstWhere(
       (value) => value.name == event.level.name,
       orElse: () => .debug,
@@ -51,9 +55,17 @@ class ConsoleLogger extends Logger {
       ? Trace.from(stackTrace)
       : stackTrace;
 
-    final message = StringBuffer(event.message ?? '');
+    final error = hasError && logErrorType
+      ? '[${event.error.runtimeType}]\n${event.error}'
+      : event.error;
+
+    final message = hasError && hasMessage && ('$error'.contains('${event.message}'))
+      ? ''
+      : event.message;
+
+    final messageWithExtra = StringBuffer(message ?? '');
     if ((event.extra != null) && event.extra!.isNotEmpty) {
-      _logExtra(event.extra!, message);
+      _logExtra(event.extra!, messageWithExtra);
     }
 
     final logger = event.error != null
@@ -66,9 +78,9 @@ class ConsoleLogger extends Logger {
 
     logger.log(
       consoleLevel,
-      message.toString().trim(),
+      messageWithExtra.toString().trim(),
       time: event.dateTime,
-      error: event.error,
+      error: error,
       stackTrace: stackTrace,
     );
 
@@ -78,9 +90,9 @@ class ConsoleLogger extends Logger {
     return logPrinter.log(
       console.LogEvent(
         consoleLevel,
-        event.message,
+        messageWithExtra.toString().trim(),
         time: event.dateTime,
-        error: event.error,
+        error: error,
         stackTrace: stackTrace,
       ),
     );
@@ -136,7 +148,7 @@ class ConsoleLogger extends Logger {
     buffer.writeln();
     extra.forEach((key, value) {
       if (capitalizeExtraKeys) {
-        key = camelToCapitalized(key.toString());
+        key = key.toString().toHumanReadable();
       }
       buffer.writeln('$headerColor• $key:');
 

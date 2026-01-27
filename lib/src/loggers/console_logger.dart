@@ -129,10 +129,7 @@ class ConsoleLogger extends Logger {
       dateTimeFormat: logTimestamp
         ? console.DateTimeFormat.onlyTimeAndSinceStart
         : console.DateTimeFormat.none,
-      excludePaths: [
-        ...excludePaths,
-        ...excludePaths.map((path) => 'package:$path')
-      ],
+      excludePaths: excludePaths,
     );
   }
 

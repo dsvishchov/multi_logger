@@ -1,3 +1,7 @@
+## 0.0.10
+
+- Remove automatic adding of package: prefixes to excluded paths in ConsoleLogger
+
 ## 0.0.9
 
 - Upgrade Sentry constraints to 9.3.0 - 9.10.0

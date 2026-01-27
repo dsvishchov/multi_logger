@@ -95,7 +95,7 @@ class ConsoleLogger extends Logger {
         error: error,
         stackTrace: stackTrace,
       ),
-    );
+    ).join('\n');
   }
 
   late console.LogFilter _logFilter;

@@ -1,3 +1,8 @@
+## 0.0.9
+
+- Upgrade Sentry constraints to 9.3.0 - 9.10.0
+- Fix issue with output format of ConsoleLogger
+
 ## 0.0.8
 
 - Add option to log error types in ConsoleLogger

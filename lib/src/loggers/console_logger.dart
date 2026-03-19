@@ -153,10 +153,8 @@ class ConsoleLogger extends Logger {
     Map<Object, dynamic> extra,
     StringBuffer buffer,
   ) {
-    final headerColor = const console.AnsiColor.fg(221);
-    final detailColor = console.AnsiColor.fg(
-      console.AnsiColor.grey(0.5),
-    );
+    final headerColor = colorize ? '${const console.AnsiColor.fg(221)}' : '';
+    final detailColor = colorize ? '${console.AnsiColor.fg(console.AnsiColor.grey(0.5))}' : '';
 
     buffer.writeln();
     extra.forEach((key, value) {

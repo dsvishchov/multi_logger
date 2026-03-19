@@ -1,3 +1,8 @@
+## 0.0.11
+
+- Add support for stderr in ConsoleLogger
+- Add support for disable color output and specify name for ConsoleLogger
+
 ## 0.0.10
 
 - Remove automatic adding of package: prefixes to excluded paths in ConsoleLogger

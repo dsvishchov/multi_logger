@@ -1,5 +1,5 @@
 import 'dart:developer' as developer;
-import 'dart:io' show Platform;
+import 'dart:io' show Platform, stderr;
 
 import 'package:logger/logger.dart' as console;
 import 'package:stack_trace/stack_trace.dart';
@@ -8,18 +8,31 @@ import '../log_event.dart';
 import '../logger.dart';
 import '../utils/name_casing.dart';
 
+enum ConsoleWriter {
+  print,
+  stderr,
+  log,
+}
+
 class ConsoleLogger extends Logger {
   ConsoleLogger({
     super.level,
     super.beforeLog,
+    this.name,
     this.excludePaths = const [],
     this.logTimestamp = false,
     this.logErrorType = true,
     this.capitalizeExtraKeys = true,
+    this.colorize = true,
+    ConsoleWriter? writer,
   }) {
     _logFilter = _ConsoleLogFilter();
     _logOutput = _ConsoleLogOutput(
+      name: name,
       logTimestamp: logTimestamp,
+      colorize: colorize,
+      writer: writer ??
+        (Platform.isAndroid || Platform.isIOS ? .log : .print),
     );
 
     // We have to have two different console loggers and printers
@@ -33,10 +46,12 @@ class ConsoleLogger extends Logger {
     _errorLogger = _logger(logPrinter: _errorLogPrinter);
   }
 
+  final String? name;
   final List<String> excludePaths;
   final bool logTimestamp;
   final bool logErrorType;
   final bool capitalizeExtraKeys;
+  final bool colorize;
 
   @override
   Future<dynamic> logEvent(LogEvent event) async {
@@ -126,6 +141,7 @@ class ConsoleLogger extends Logger {
       errorMethodCount: 8,
       noBoxingByDefault: noBoxing,
       printEmojis: false,
+      colors: colorize,
       dateTimeFormat: logTimestamp
         ? console.DateTimeFormat.onlyTimeAndSinceStart
         : console.DateTimeFormat.none,
@@ -171,32 +187,47 @@ class _ConsoleLogFilter extends console.LogFilter {
 
 class _ConsoleLogOutput extends console.LogOutput {
   _ConsoleLogOutput({
-    this.logTimestamp = false,
+    this.name,
+    required this.writer,
+    required this.logTimestamp,
+    required this.colorize,
   });
 
+  final String? name;
+  final ConsoleWriter writer;
   final bool logTimestamp;
+  final bool colorize;
 
   @override
   void output(console.OutputEvent event) {
-    final levelColor = console.PrettyPrinter.defaultLevelColors[event.level];
+    final levelColor = colorize ? '${console.PrettyPrinter.defaultLevelColors[event.level]}' : '';
     final levelName = _levelName(event);
 
-    final usePrintForOutput = !Platform.isAndroid && !Platform.isIOS;
-    final levelPadding = ''.padLeft(usePrintForOutput ? levelName.length + 3 : 0, ' ');
+    final levelPadding = ''.padLeft(writer != .log ? levelName.length + 3 : 0, ' ');
     final lines = event.lines.indexed.map((value) {
       return '${value.$1 > 0 ? levelPadding : ''}${value.$2}';
     });
 
-    final buffer = StringBuffer();
+    final buffer = StringBuffer(name != null ? '[$name] ' : '');
     lines.forEach(buffer.writeln);
 
-    final output = '$levelColor${buffer.toString()}';
+    final output = writer == .log
+      ? '$levelColor$buffer'
+      : '$levelColor[$levelName] $buffer';
 
-    if (!usePrintForOutput) {
-      developer.log(output, name: levelName);
-    } else {
-      // ignore: avoid_print
-      print('$levelColor[${_levelName(event)}] $output');
+    switch (writer) {
+      case .print:
+        // ignore: avoid_print
+        print(output);
+        break;
+
+      case .log:
+        developer.log(output, name: levelName);
+        break;
+
+      case .stderr:
+        stderr.write(output);
+        break;
     }
   }
 

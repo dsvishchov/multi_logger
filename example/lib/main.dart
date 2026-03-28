@@ -1,6 +1,16 @@
+import 'package:flutter/material.dart';
 import 'package:multi_logger/multi_logger.dart';
 
-Future<void> main() async {
+void main() async {
+  initLogging();
+
+ final exception = Exception('Test exception');
+ logger.error(exception);
+
+  runApp(const MyApp());
+}
+
+void initLogging() {
   logger = MultiLogger(
     loggers: [
       ConsoleLogger(
@@ -15,8 +25,19 @@ Future<void> main() async {
       ),
     ]
   );
+}
 
-  final exception = Exception('Test exception');
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  logger.trace(exception);
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('multi_logger example'),
+        ),
+      ),
+    );
+  }
 }

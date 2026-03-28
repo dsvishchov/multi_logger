@@ -1,3 +1,7 @@
+## 0.0.12
+
+- Add support for web
+
 ## 0.0.11
 
 - Add support for stderr in ConsoleLogger

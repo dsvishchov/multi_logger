@@ -1,8 +1,9 @@
 import 'dart:developer' as developer;
-import 'dart:io' show Platform, stderr;
+import 'dart:io' show stderr;
 
 import 'package:logger/logger.dart' as console;
 import 'package:stack_trace/stack_trace.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 import '../log_event.dart';
 import '../logger.dart';
@@ -32,7 +33,7 @@ class ConsoleLogger extends Logger {
       logTimestamp: logTimestamp,
       colorize: colorize,
       writer: writer ??
-        (Platform.isAndroid || Platform.isIOS ? .log : .print),
+        ((UniversalPlatform.isAndroid || UniversalPlatform.isIOS) ? .log : .print),
     );
 
     // We have to have two different console loggers and printers

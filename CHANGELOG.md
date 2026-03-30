@@ -1,3 +1,7 @@
+## 0.0.13
+
+- Add support for failures
+
 ## 0.0.12
 
 - Add support for web

@@ -1,7 +1,7 @@
 name: multi_logger_example
 description: An example of using multi_logger package
 publish_to: none
-version: 0.0.12
+version: 0.0.13
 
 environment:
   sdk: ^3.10.0

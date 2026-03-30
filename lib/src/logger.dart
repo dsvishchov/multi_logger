@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:failures/failures.dart';
+
 import 'log_event.dart';
 import 'log_level.dart';
 
@@ -152,6 +154,20 @@ abstract class Logger {
   /// Process specific event through level checks and callbacks
   Future<void> processEvent(LogEvent event) async {
     if (event.level < level) return;
+
+    if (event.message is Failure) {
+      final Failure failure = event.message;
+
+      event = event.copyWith(
+        message: failure.message,
+        error: failure,
+        stackTrace: failure.stackTrace,
+        extra: {
+          ...?failure.extra,
+          'underlyingError': ?failure.underlyingError,
+        },
+      );
+    }
 
     LogEvent? modifiedEvent = event;
 
